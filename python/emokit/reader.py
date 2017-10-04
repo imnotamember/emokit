@@ -104,7 +104,7 @@ class EmotivReader(object):
                 time.sleep(0.00001)
             self.lock.acquire()
             if self._stop_signal:
-                print("Reader stopping...")
+                # print("Reader stopping...")
                 self.running = False
         if self.file is not None:
             self.file.close()
@@ -122,7 +122,7 @@ class EmotivReader(object):
                 hidapi.hid_exit()
             except Exception:
                 pass
-        print("Reader stopped...")
+        # print("Reader stopped...")
         self.stopped = True
         return
 

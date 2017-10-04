@@ -3,7 +3,6 @@
 
 
 import time
-
 from emokit.emotiv import Emotiv
 
 if __name__ == "__main__":
@@ -12,4 +11,4 @@ if __name__ == "__main__":
             packet = headset.dequeue()
             if packet is not None:
                 pass
-            time.sleep(0.001)
+            time.sleep(0.1)
