@@ -126,7 +126,7 @@ class EmotivCrypto:
             else:
                 return AES.new(new_crypto_key(self.serial_number, self.verbose))
         else:
-            return AES.new(crypto_key(self.serial_number, self.is_research, verbose), AES.MODE_ECB, iv)
+            return AES.new(crypto_key(self.serial_number, self.is_research, verbose), AES.MODE_ECB)#, iv)
 
     def add_task(self, data):
         """

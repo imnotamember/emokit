@@ -8,9 +8,9 @@ import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 import numpy as np
 
-electrodes = (('AF3', 'value'), ('AF4', 'value'), ('F3', 'value'), ('F4', 'value'), ('F7', 'value'), ('F8', 'value'),
-              ('FC5', 'value'), ('FC6', 'value'), ('T7', 'value'), ('T8', 'value'), ('P7', 'value'), ('P8', 'value'),
-              ('O1', 'value'), ('O2', 'value')
+electrodes = (('AF3', (15, 150, 255)), ('AF4', (150, 255, 15)), ('F3', (255, 15, 150)), ('F4', (15, 150, 255)), ('F7', (150, 255, 15)), ('F8', (255, 15, 150)),
+              ('FC5', (15, 150, 255)), ('FC6', (150, 255, 15)), ('T7', (255, 15, 150)), ('T8', (15, 150, 255)), ('P7', (150, 255, 15)), ('P8', (255, 15, 150)),
+              ('O1', (15, 150, 255)), ('O2', (150, 255, 15))
               )
 
 win = pg.GraphicsWindow()
@@ -30,6 +30,7 @@ for i in xrange(14):
     if i:
         win.nextRow()
     p = win.addPlot()
+    # p.setPen((255, 125, 123))
     if i == 13:
         p.setLabel('bottom', 'Time', 's')
     else:
@@ -41,7 +42,7 @@ for i in xrange(14):
     allWaves.append([p, data, ptr, curves])
 
 
-def update3(p, data, ptr, i_curves, emo_data):
+def update3(p, data, ptr, i_curves, emo_data, color):
     now = pg.ptime.time()
     for c in i_curves:
         c.setPos(-(now - startTime), 0)
@@ -49,6 +50,7 @@ def update3(p, data, ptr, i_curves, emo_data):
     i = ptr % chunkSize
     if i == 0:
         curve = p.plot()
+        curve.setPen(color)  # (255, 125, 123))
         i_curves.append(curve)
         last = data[-1]
         data = np.empty((chunkSize + 1, 2))
@@ -59,8 +61,8 @@ def update3(p, data, ptr, i_curves, emo_data):
     else:
         curve = i_curves[-1]
     data[i + 1, 0] = now - startTime
-    data[i + 1, 1] = emo_data / 10000  # np.random.normal()  # dummy data
-    print emo_data
+    data[i + 1, 1] = emo_data / 1000  # np.random.normal()  # dummy data  #
+    # print emo_data
     # data[i + 1, 1] = ef.process_decrypted_packet_queue(raw_decrypted_packet, processed_packets)
     curve.setData(x=data[:i + 2, 0], y=data[:i + 2, 1])
     ptr += 1
@@ -74,7 +76,7 @@ def update():
     packet = headset.dequeue()
     if packet is not None:
         for i, wave in enumerate(allWaves):
-            wave = update3(*wave, emo_data=packet.sensors[electrodes[i][0]]['value'])
+            wave = update3(*wave, emo_data=packet.sensors[electrodes[i][0]]['value'], color=electrodes[i][1])
             allWaves[i] = wave
 
 
