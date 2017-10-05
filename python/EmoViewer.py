@@ -42,7 +42,7 @@ for i in xrange(14):
     allWaves.append([p, data, ptr, curves])
 
 
-def update3(p, data, ptr, i_curves, emo_data, color):
+def update3(p, data, ptr, i_curves, startTime, emo_data, color):
     now = pg.ptime.time()
     for c in i_curves:
         c.setPos(-(now - startTime), 0)
@@ -61,7 +61,7 @@ def update3(p, data, ptr, i_curves, emo_data, color):
     else:
         curve = i_curves[-1]
     data[i + 1, 0] = now - startTime
-    data[i + 1, 1] = emo_data / 1000  # np.random.normal()  # dummy data  #
+    data[i + 1, 1] = emo_data / 4000  #np.random.normal()  # dummy data  #
     # print emo_data
     # data[i + 1, 1] = ef.process_decrypted_packet_queue(raw_decrypted_packet, processed_packets)
     curve.setData(x=data[:i + 2, 0], y=data[:i + 2, 1])
@@ -72,11 +72,14 @@ def update3(p, data, ptr, i_curves, emo_data, color):
 # update all plots
 def update():
     global allWaves
+    global startTime
     global headset
     packet = headset.dequeue()
+    #packet = 1
     if packet is not None:
         for i, wave in enumerate(allWaves):
-            wave = update3(*wave, emo_data=packet.sensors[electrodes[i][0]]['value'], color=electrodes[i][1])
+            wave = update3(*wave, startTime=startTime, emo_data=packet.sensors[electrodes[i][0]]['value'], color=electrodes[i][1])
+            #wave = update3(*wave, emo_data=1, color=electrodes[i][1])
             allWaves[i] = wave
 
 

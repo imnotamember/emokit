@@ -169,7 +169,7 @@ class EmotivReader(object):
             if len(devices) == 0:
                 print_hid_enumerate(system_platform, hid)
                 sys.exit()
-            device = devices[1]
+            device = devices[0]
             device.open()
             self.hid = device
             self.serial_number = device.serial_number

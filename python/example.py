@@ -6,7 +6,7 @@ import time
 from emokit.emotiv import Emotiv
 
 if __name__ == "__main__":
-    with Emotiv(display_output=True, verbose=False) as headset:
+    with Emotiv(display_output=True, verbose=True) as headset:
         while True:
             packet = headset.dequeue()
             if packet is not None:
