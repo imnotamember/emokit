@@ -24,8 +24,8 @@ class emo_waves(QtGui.QWidget):
                            }
         self.all_waves = []
         for i in xrange(14):
-            self.plotcurve = pg.PlotCurveItem()
-            self.plotwidget.addItem(self.plotcurve)
+            self.plotcurve = pg.PlotDataItem()
+            self.plotwidget[i].addItem(self.plotcurve)
             self.plotcurve.setPen(self.electrodes_colors[i][1])
             self.all_waves.append(self.plotcurve)
         self.amplitude = 10
@@ -44,21 +44,32 @@ class emo_waves(QtGui.QWidget):
 
         self.timer = pg.QtCore.QTimer()
         self.timer.timeout.connect(self.moveplot)
-        self.timer.start(100)
+        self.timer.start(10)
 
     def init_ui(self):
-        self.setWindowTitle('Sinuswave')
-        hbox = QtGui.QVBoxLayout()
-        self.setLayout(hbox)
-
-        self.plotwidget = pg.PlotWidget()
-        hbox.addWidget(self.plotwidget)
+        self.setWindowTitle('EmoViewer')
+        layout = QtGui.QVBoxLayout()
+        # layout = QtGui.QGridLayout()
+        self.plots_widget = pg.GraphicsLayoutWidget()
+        layout.addWidget(self.plots_widget)
+        self.setLayout(layout)
+        self.plotwidget = []
+        for i in xrange(14):
+            if i:
+                self.plots_widget.nextRow()
+            self.plotwidget.append(self.plots_widget.addPlot())  # pg.PlotWidget())
+            if i == 13:
+                self.plotwidget[-1].setLabel('bottom', 'Time', 's')
+            else:
+                self.plotwidget[-1].showAxis('bottom', False)
+            #self.plotwidget[-1].showAxis(False)
+            #layout.addPlot(self.plotwidget[-1])
 
         self.increasebutton = QtGui.QPushButton("Increase Amplitude")
         self.decreasebutton = QtGui.QPushButton("Decrease Amplitude")
 
-        hbox.addWidget(self.increasebutton)
-        hbox.addWidget(self.decreasebutton)
+        # layout.addWidget(self.increasebutton)
+        # layout.addWidget(self.decreasebutton)
 
         self.setGeometry(10, 10, 1000, 600)
         self.show()
@@ -69,6 +80,8 @@ class emo_waves(QtGui.QWidget):
 
     def moveplot(self):
         self.t+=1
+        self.plotwidget[-1].setPos(-self.t, 0)
+        self.update_electrode()
         self.updateplot()
 
     def updateplot(self):
@@ -79,17 +92,19 @@ class emo_waves(QtGui.QWidget):
         for i, plot in enumerate(self.all_waves):
             data_x = self.electrodes[self.electrodes_colors[i][0]][0]
             data_y = self.electrodes[self.electrodes_colors[i][0]][1]
-            self.plotcurve.setData(x=data_x, y=data_y)
+            plot.setData(data_y)
+            #plot.setPos(data_x[0], 0)
 
     def update_electrode(self):
         if self.headset.dequeue() is not None:
             for key in self.electrodes.keys():
                 data_y = self.electrodes[key][1]
                 data_y = np.roll(data_y, -1)
-                data_y[-1] = self.headset.dequeue().sensors[key]['value'] / 4000
+                data_y[-1] = self.headset.dequeue().sensors[key]['value'] - 8192
                 data_x = self.electrodes[key][0]
                 data_x = np.roll(data_x, -1)
                 data_x[-1] = self.t
+                self.electrodes[key] = [data_x, data_y]
 
     def on_increasebutton_clicked(self):
         print ("Amplitude increased")
